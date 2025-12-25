@@ -1,0 +1,1 @@
+console.log('Sethani Rates App Loaded');
