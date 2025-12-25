@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1e40af">
+    <title>Sethani Rates - Professional Blue Edition</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- PDF Generation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        :root {
+            --brand-blue: #1e40af;
+            --brand-light-blue: #3b82f6;
+            --brand-soft-blue: #eff6ff;
+            --bg-page: #f8fafc;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --white: #ffffff;
+            --border-color: #e2e8f0;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.05);
+        }
+
+        * { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-dark);
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            padding: 40px 20px 60px;
+            color: white;
+            text-align: center;
+            border-bottom-left-radius: 40px;
+            border-bottom-right-radius: 40px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .header h1 { 
+            margin: 0; 
+            font-size: 2.2rem; 
+            font-weight: 800; 
+            letter-spacing: -0.025em;
+        }
+
+        .header p { 
+            margin: 8px 0 0; 
+            opacity: 0.8; 
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        .nav-wrapper {
+            max-width: 700px;
+            margin: -30px auto 30px;
+            padding: 0 20px;
+        }
+
+        .tabs {
+            display: flex;
+            background: var(--white);
+            padding: 8px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+        }
+
+        .tab-btn {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 16px 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 14px;
+            font-size: 0.95rem;
+            letter-spacing: 0.01em;
+        }
+
+        .tab-btn.active {
+            background: var(--brand-blue);
+            color: white;
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.25);
+        }
+
+        .view {
+            padding: 0 20px 60px;
+            display: none;
+            max-width: 1000px;
+            margin: 0 auto;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .view.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: var(--white);
+            padding: 32px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 24px;
+            border: 1px solid var(--border-color);
+        }
+
+        .input-group { margin-bottom: 24px; }
+        .input-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--brand-blue);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .input-control {
+            width: 100%;
+            padding: 16px;
+            font-size: 1.1rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: #fff;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        .input-control:focus {
+            border-color: var(--brand-blue);
+            box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.08);
+        }
+
+        .btn {
+            padding: 18px 24px;
+            border-radius: var(--radius-md);
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            font-size: 1.05rem;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .btn-primary { background: var(--brand-blue); color: white; }
+        .btn-primary:hover { background: #1e3a8a; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-whatsapp { background: #25d366; color: white; }
+        .btn-info { background: #3b82f6; color: white; }
+        .btn-edit { background: #f59e0b; color: white; padding: 6px 12px; font-size: 0.75rem; border-radius: 6px; width: auto; font-weight: 700; border: none; cursor: pointer; }
+        .btn-delete { background: #ef4444; color: white; padding: 6px 12px; font-size: 0.75rem; border-radius: 6px; width: auto; font-weight: 700; border: none; cursor: pointer; }
+
+        .results-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+        }
+
+        .res-box {
+            background: var(--white);
+            padding: 24px;
+            border-radius: var(--radius-md);
+            border: 2px solid var(--border-color);
+            text-align: center;
+        }
+
+        .res-box.primary {
+            background: var(--brand-soft-blue);
+            border-color: var(--brand-light-blue);
+        }
+
+        .res-box .label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .res-box .value {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .table-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .table-scroll { overflow-x: auto; }
+
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        th { background: #f8fafc; padding: 20px 15px; text-align: left; font-size: 0.8rem; font-weight: 800; color: var(--brand-blue); border-bottom: 2px solid var(--border-color); white-space: nowrap; }
+        td { padding: 18px 15px; border-bottom: 1px solid #f1f5f9; font-size: 1rem; font-weight: 600; white-space: nowrap; }
+
+        .qty-badge {
+            background: var(--brand-soft-blue);
+            color: var(--brand-blue);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 0.9rem;
+        }
+
+        .action-cell {
+            display: flex;
+            gap: 8px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .form-row { grid-template-columns: 1fr; }
+            .header h1 { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="header">
+    <h1>Sethani Sarees</h1>
+    <p>Professional Rate Management System</p>
+</header>
+
+<div class="nav-wrapper">
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('forward')">CALCULATOR</button>
+        <button class="tab-btn" onclick="switchTab('reverse')">H.L. RATES</button>
+        <button class="tab-btn" onclick="switchTab('sheet')">SHEET MAKER</button>
+    </div>
+</div>
+
+<div id="view-forward" class="view active">
+    <div class="card">
+        <div class="input-group">
+            <label>Product & GST Configuration</label>
+            <select id="f_config" class="input-control" onchange="calcForward()">
+                <option value="saree_5">Saree (5%)</option>
+                <option value="lehenga_5">Lehenga (5%)</option>
+                <option value="lehenga_18">Lehenga (18%)</option>
+            </select>
+        </div>
+        <div class="form-row">
+            <div class="input-group">
+                <label>Billing Rate (₹)</label>
+                <input type="number" id="f_billing" class="input-control" placeholder="0.00" oninput="calcForward()">
+            </div>
+            <div class="input-group">
+                <label>Discount (%)</label>
+                <input type="number" id="f_discount" class="input-control" value="0" step="0.01" oninput="calcForward()">
+            </div>
+        </div>
+    </div>
+    <div id="f_results" class="results-container"></div>
+</div>
+
+<div id="view-reverse" class="view">
+    <div class="card">
+        <div class="input-group">
+            <label>Target Product</label>
+            <select id="r_config" class="input-control" onchange="calcReverse()">
+                <option value="saree_5">Saree (5%)</option>
+                <option value="lehenga_5">Lehenga (5%)</option>
+                <option value="lehenga_18">Lehenga (18%)</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Target Rate A (Desired Sale Price)</label>
+            <input type="number" id="r_ssp" class="input-control" placeholder="e.g. 2500" oninput="calcReverse()">
+        </div>
+    </div>
+    <div id="r_results" class="results-container"></div>
+</div>
+
+<div id="view-sheet" class="view">
+    <div class="card">
+        <div class="input-group">
+            <label>Category for Batch</label>
+            <select id="s_config" class="input-control">
+                <option value="saree_5">Saree (5%)</option>
+                <option value="lehenga_5">Lehenga (5%)</option>
+                <option value="lehenga_18">Lehenga (18%)</option>
+            </select>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 100px 1fr 100px; gap: 15px;">
+            <div class="input-group">
+                <label>Code</label>
+                <input type="text" id="s_prefix" class="input-control" placeholder="LX">
+            </div>
+            <div class="input-group">
+                <label>Item Name</label>
+                <input type="text" id="s_name" class="input-control" placeholder="Enter Name">
+            </div>
+            <div class="input-group">
+                <label>Qty</label>
+                <input type="number" id="s_qty" class="input-control" value="1">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="input-group">
+                <label>Billing (₹)</label>
+                <input type="number" id="s_rate" class="input-control" placeholder="0.00">
+            </div>
+            <div class="input-group">
+                <label>Disc (%)</label>
+                <input type="number" id="s_discount" class="input-control" value="0" step="0.01">
+            </div>
+        </div>
+
+        <button onclick="addItem()" class="btn btn-primary" id="add-btn">ADD ITEM TO SHEET</button>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 10px;">
+        <button onclick="downloadPDF()" class="btn btn-info">SAVE PDF</button>
+        <button onclick="sharePDF()" class="btn btn-primary" style="background:#075e54">SHARE PDF TO WHATSAPP</button>
+    </div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px;">
+        <button onclick="sendToWhatsAppText()" class="btn btn-whatsapp">WHATSAPP TEXT ONLY</button>
+        <button onclick="clearSheet()" class="btn btn-danger">CLEAR SHEET</button>
+    </div>
+
+    <div class="table-card">
+        <div class="table-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ITEM DETAILS</th>
+                        <th>QTY</th>
+                        <th>BILLING</th>
+                        <th>CP</th>
+                        <th>RATE A</th>
+                        <th>RATE B</th>
+                        <th>RATE C</th>
+                        <th>ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody id="sheet-body"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    const RATES = {
+        saree: {
+            new:   [{u: 480, p: 20}, {u: 955, p: 25}, {u: 1910, p: 30}, {u: 4765, p: 40}, {u: Infinity, p: 50}],
+            old:   [{u: 480, p: 45}, {u: 955, p: 55}, {u: 1910, p: 65}, {u: 4765, p: 75}, {u: Infinity, p: 80}],
+            whole: [{u: 800, p: 10}, {u: 1200, p: 13}, {u: 2000, p: 15}, {u: Infinity, p: 20}]
+        },
+        lehenga_5: {
+            new:   [{u: 1430, p: 40}, {u: 2860, p: 50}, {u: 4765, p: 55}, {u: Infinity, p: 60}],
+            old:   [{u: 1430, p: 65}, {u: 2860, p: 75}, {u: 4765, p: 85}, {u: Infinity, p: 90}],
+            whole: [{u: 1430, p: 20}, {u: 2860, p: 25}, {u: 4765, p: 30}, {u: Infinity, p: 35}]
+        },
+        lehenga_18: {
+            new:   [{u: 1430, p: 40}, {u: 2860, p: 50}, {u: 4765, p: 55}, {u: Infinity, p: 60}],
+            old:   [{u: 1430, p: 58}, {u: 2860, p: 68}, {u: 4765, p: 78}, {u: Infinity, p: 83}],
+            whole: [{u: 1430, p: 20}, {u: 2860, p: 25}, {u: 4765, p: 30}, {u: Infinity, p: 35}]
+        }
+    };
+
+    let items = JSON.parse(localStorage.getItem('sethani_v5_data') || '[]');
+
+    function calculate(cp, type, gst) {
+        const cat = type === 'saree' ? 'saree' : `lehenga_${gst}`;
+        const config = RATES[cat];
+        const pNew = config.new.find(x => cp <= x.u).p;
+        const pOld = config.old.find(x => cp <= x.u).p;
+        const pWhole = config.whole.find(x => cp <= x.u).p;
+        return {
+            cp: Math.round(cp),
+            rateA: Math.ceil((cp * (1 + pNew/100))/10)*10,
+            rateB: Math.ceil((cp * (1 + pWhole/100))/5)*5,
+            rateC: Math.ceil((cp * (1 + pOld/100))/10)*10
+        };
+    }
+
+    function switchTab(name) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`view-${name}`).classList.add('active');
+        document.querySelector(`.tab-btn[onclick*="${name}"]`).classList.add('active');
+    }
+
+    function calcForward() {
+        const conf = document.getElementById('f_config').value.split('_');
+        const br = parseFloat(document.getElementById('f_billing').value);
+        const ds = parseFloat(document.getElementById('f_discount').value) || 0;
+        if(!br) { document.getElementById('f_results').innerHTML = ''; return; }
+        const cp = br * (1 - ds/100) * (1 + parseInt(conf[1])/100);
+        const r = calculate(cp, conf[0], conf[1]);
+        document.getElementById('f_results').innerHTML = `
+            <div class="res-box"><span class="label">Unit CP</span><span class="value">₹${r.cp}</span></div>
+            <div class="res-box primary"><span class="label">Rate A</span><span class="value" style="color:var(--brand-blue)">₹${r.rateA}</span></div>
+            <div class="res-box primary"><span class="label">Rate B</span><span class="value" style="color:#059669">₹${r.rateB}</span></div>
+            <div class="res-box"><span class="label">Rate C</span><span class="value">₹${r.rateC}</span></div>
+        `;
+    }
+
+    function calcReverse() {
+        const conf = document.getElementById('r_config').value.split('_');
+        const ssp = parseFloat(document.getElementById('r_ssp').value);
+        if(!ssp) { document.getElementById('r_results').innerHTML = ''; return; }
+        let best = { diff: Infinity, cp: 0, rateA: 0, rateB: 0 };
+        for (let testCp = 10; testCp < ssp * 1.5; testCp++) {
+            const r = calculate(testCp, conf[0], conf[1]);
+            const diff = Math.abs(r.rateA - ssp);
+            if(diff < best.diff) best = { ...r, diff };
+            if(diff === 0) break;
+        }
+        document.getElementById('r_results').innerHTML = `
+            <div class="res-box"><span class="label">Calculated CP</span><span class="value">₹${best.cp}</span></div>
+            <div class="res-box primary"><span class="label">Matched Rate A</span><span class="value">₹${best.rateA}</span></div>
+            <div class="res-box"><span class="label">Matched Rate B</span><span class="value">₹${best.rateB}</span></div>
+        `;
+    }
+
+    function addItem() {
+        const configVal = document.getElementById('s_config').value;
+        const nameInput = document.getElementById('s_name');
+        const prefix = document.getElementById('s_prefix').value.trim();
+        const qty = parseInt(document.getElementById('s_qty').value) || 1;
+        const bill = parseFloat(document.getElementById('s_rate').value);
+        const disc = parseFloat(document.getElementById('s_discount').value) || 0;
+        const conf = configVal.split('_');
+        if(!nameInput.value || isNaN(bill)) return;
+        const cp = bill * (1 - disc/100) * (1 + parseInt(conf[1])/100);
+        const res = calculate(cp, conf[0], conf[1]);
+        items.push({ 
+            name: prefix ? `${prefix}-${nameInput.value.trim()}` : nameInput.value.trim(),
+            rawName: nameInput.value.trim(),
+            prefix: prefix,
+            qty, billing: bill, discount: disc, config: configVal, ...res 
+        });
+        resetSheetForm();
+        renderSheet();
+    }
+
+    function resetSheetForm() {
+        document.getElementById('s_name').value = '';
+        document.getElementById('s_rate').value = '';
+        document.getElementById('s_qty').value = '1';
+        document.getElementById('s_name').focus();
+    }
+
+    function editItem(idx) {
+        const item = items[idx];
+        document.getElementById('s_config').value = item.config || 'saree_5';
+        document.getElementById('s_prefix').value = item.prefix || '';
+        document.getElementById('s_name').value = item.rawName || item.name;
+        document.getElementById('s_qty').value = item.qty;
+        document.getElementById('s_rate').value = item.billing;
+        document.getElementById('s_discount').value = item.discount;
+        items.splice(idx, 1);
+        renderSheet();
+        document.getElementById('s_name').focus();
+    }
+
+    function renderSheet() {
+        const body = document.getElementById('sheet-body');
+        body.innerHTML = '';
+        items.forEach((item, idx) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="font-weight:700">${item.name}</td>
+                <td><span class="qty-badge">${item.qty}</span></td>
+                <td>₹${item.billing}</td>
+                <td>₹${item.cp}</td>
+                <td style="color:var(--brand-blue); font-weight:800">₹${item.rateA}</td>
+                <td style="color:#059669; font-weight:800">₹${item.rateB}</td>
+                <td style="color:var(--text-muted)">₹${item.rateC}</td>
+                <td class="action-cell">
+                    <button onclick="editItem(${idx})" class="btn-edit">Edit</button>
+                    <button onclick="removeItem(${idx})" class="btn-delete">Del</button>
+                </td>
+            `;
+            body.appendChild(tr);
+        });
+        localStorage.setItem('sethani_v5_data', JSON.stringify(items));
+    }
+
+    function removeItem(idx) { items.splice(idx, 1); renderSheet(); }
+    function clearSheet() { if(confirm("Clear current sheet?")) { items = []; renderSheet(); } }
+
+    function generatePDFBlob() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'pt', 'a4');
+        doc.setFontSize(22); doc.setFont("helvetica", "bold"); doc.setTextColor(0, 0, 0);
+        doc.text("SETHANI SAREES - RATE CALCULATION", 40, 50);
+        doc.setFontSize(11); doc.setFont("helvetica", "normal");
+        doc.text(`DATE: ${new Date().toLocaleDateString()} | ITEMS: ${items.length}`, 40, 75);
+        const tableBody = [];
+        items.forEach((item, index) => {
+            const billingVal = item.billing || item.bill || 0;
+            tableBody.push([
+                (index + 1).toString(),
+                item.name,
+                item.qty.toString(),
+                `Rs.${billingVal}`,
+                `Rs.${item.cp}`,
+                `Rs.${item.rateA}`,
+                `Rs.${item.rateB}`,
+                `Rs.${item.rateC}`
+            ]);
+            tableBody.push([{ content: '', colSpan: 8, styles: { minCellHeight: 25, border: 'none' } }]);
+        });
+        doc.autoTable({
+            startY: 100,
+            head: [['S.NO', 'ITEM NAME', 'QTY', 'BILLING', 'CP', 'RATE A', 'RATE B', 'RATE C']],
+            body: tableBody,
+            theme: 'grid',
+            headStyles: { fillColor: [0, 0, 0], textColor: [255, 255, 255], fontSize: 12, fontStyle: 'bold', halign: 'center' },
+            styles: { fontSize: 11, textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 1, fontStyle: 'bold', cellPadding: 5 },
+            columnStyles: { 0: { halign: 'center', cellWidth: 35 }, 2: { halign: 'center', cellWidth: 40 }, 3: { halign: 'right' }, 4: { halign: 'right' }, 5: { halign: 'right' }, 6: { halign: 'right' }, 7: { halign: 'right' } },
+            margin: { left: 30, right: 30 }
+        });
+        return doc;
+    }
+
+    async function sharePDF() {
+        if (items.length === 0) return;
+        const doc = generatePDFBlob();
+        const pdfOutput = doc.output('blob');
+        const filename = `Sethani_Rates_${Date.now()}.pdf`;
+        const file = new File([pdfOutput], filename, { type: 'application/pdf' });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            try {
+                await navigator.share({
+                    files: [file],
+                    title: 'Sethani Sarees Rate Sheet',
+                    text: 'Here is the rate sheet from Sethani Sarees.'
+                });
+            } catch (err) {
+                console.error('Sharing failed', err);
+            }
+        } else {
+            const msgBox = document.createElement('div');
+            msgBox.style = "position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:20px;border-radius:12px;box-shadow:0 0 20px rgba(0,0,0,0.2);z-index:9999;text-align:center;";
+            msgBox.innerHTML = `<h3>Direct Share Not Supported</h3><p>Your browser doesn't support direct file sharing. Please click <b>SAVE PDF</b> instead and send it manually.</p><button onclick="this.parentElement.remove()" class="btn btn-primary">OK</button>`;
+            document.body.appendChild(msgBox);
+        }
+    }
+
+    function downloadPDF() {
+        if (items.length === 0) return;
+        const doc = generatePDFBlob();
+        doc.save(`Sethani_Rates_Print_${Date.now()}.pdf`);
+    }
+
+    function sendToWhatsAppText() {
+        if(items.length === 0) return;
+        let msg = "*SETHANI SAREES RATE SHEET*\n";
+        items.forEach((i, idx) => {
+            const billVal = i.billing || i.bill || 0;
+            msg += `\n${idx+1}. *${i.name}* (Qty: ${i.qty})\n   Bill: ₹${billVal} | CP: ₹${i.cp}\n   *Rate A: ₹${i.rateA}* | Rate B: ₹${i.rateB}\n`;
+        });
+        window.open(`https://wa.me/918770384367?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    window.addEventListener('keydown', e => {
+        if(e.key === 'Enter') {
+            const id = document.activeElement.id;
+            if(id === 's_name') document.getElementById('s_qty').focus();
+            else if(id === 's_qty') document.getElementById('s_rate').focus();
+            else if(id === 's_rate') document.getElementById('s_discount').focus();
+            else if(id === 's_discount') addItem();
+        }
+    });
+
+    window.onload = renderSheet;
+</script>
+</body>
+</html>
